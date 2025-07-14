@@ -92,6 +92,23 @@ Forward port 443 → ( for our https website)
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()";
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
+   # This is for the amdin ( admin.html)
+  location /admin  
+
+        allow private_ip;  # Replace with your allowed IP. !!! IMPORTANT !!! The admin panel will be blocked for everyone excepet the ips you allow. YOU HAVE TO USE THE PRIVATE IP OF THE SERVER TO HAVE ACCESS TO THE ADMIN FORM THE ALLOWED IPS.ACCESSING THE ADMIN FROM THE DNS YOU GOT , IT WILL BLOCK IT EVEN USING ALLOWED IPS.ONLY FROM THE SERVER IP WILL WORK.
+        
+        
+        deny all;
+
+
+        proxy_pass http://192.168.10.25:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+   # This is for the client ( index.html )
     location / {
         proxy_pass http://your_private_ip:3000;
         proxy_http_version 1.1;
