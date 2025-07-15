@@ -9,12 +9,41 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
 const crypto = require('crypto');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MUSIC_DIR =  process.env.MUSIC_PATH;
 const PUBLISHED_JSON = path.join(__dirname, 'published.json');
 const SCHEDULED_JSON = path.join(__dirname, 'scheduled.json');
+const ipRangeCheck = require('ip-range-check');
+app.set('trust proxy', true);
+
+// ipRangeCheck configuration
+const ADMIN_IPS = (process.env.ADMIN_IPS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+// Helper to grab client IP (via X-Forwarded-For or socket)
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return xff.split(',')[0].trim();
+  return req.socket.remoteAddress;
+}
+
+// Middleware
+function ipWhitelist(req, res, next) {
+  const clientIp = getClientIp(req);
+  if (ipRangeCheck(clientIp, ADMIN_IPS)) {
+    return next();
+  }
+  console.warn(`Blocked admin access from IP: ${clientIp}`);
+  return res.status(403).send('Forbidden');
+}
+
+app.use('/admin', ipWhitelist);
+
+
+
 
 // Security headers middleware
 app.use(helmet({
