@@ -4,7 +4,7 @@ port 80 is for nginx
 
 port 443 is for certbot ssl autorenew and website.
 
-This port must be open and are included to the nginx cofig file ( nginx config file for services after-cerbot-ssl-cert )
+This port must be open and  included to the nginx cofig file ( nginx config file for services after-cerbot-ssl-cert )
 
 But since we want our servises to be running locally we are going to be forwading through the nginx config file our domain to a close port ( 8443 , that must be allowed on the server;s firewall to the ips that you whant to access the services ( not to everyone ) but we will not port forward it to the router.)
 

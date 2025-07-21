@@ -34,6 +34,8 @@ You can now ssh to the server with the user that is not forced to sftp only. Mea
      
    3.3 : In /etc/pam.d/sshd :   account required pam_access.so
 
+   3.4   In /etc/pam.d/login : account required pam_access.so
+
 sudo systemctl restart ssh
 
 3 way security for ssh

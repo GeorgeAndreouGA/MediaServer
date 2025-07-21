@@ -2,14 +2,21 @@
 
 10.1 npm install -g pm2 ( install in /var/www/sitename )
 
-10.2 pm2 start server.js ( start the server.js)
 
-10.3 pm2 save
+10.2 PORT=3000 pm2 start server.js --name cluster_1_port_3000            
+    
+10.3 PORT=3001 pm2 start server.js --name cluster_1_port_3001
+    
+10.4 PORT=3002 pm2 start server.js --name cluster_1_port_3002
 
-10.4 pm2 startup ( after running this command PM2 will print a command )
+!!!IMPORTANT !!!  ( the --name .........   must be included . you can give any name that you want  )  . We start  our server.js on multible ports ( the server.js code supports it ) so that we can create a load balancer . This ports must be included in the final nginx config for the music site ( see site-name-nginx-configuration-after-certbot-ssl-cert.txt )
 
-10.5 Copy and run that command.
+10.5 pm2 save
 
-10.6 pm2 save
+10.6 pm2 startup ( after running this command PM2 will print a command )
 
-10.7 pm2 restart server.js ( in /var/www/sitename  to restart the .js )
+10.7 Copy and run that command.
+
+10.8 pm2 save
+
+10.9 pm2 restart server.js ( in /var/www/sitename  to restart the .js )
