@@ -1,4 +1,4 @@
-for our services ( EXEPT kasm ) for ssl certs and reverse proxing we are going to be using one nginx config file that will allow port 80 and 443 ( must be open to server's firewall to everyone and to router) to :
+for our services for ssl certs and reverse proxing we are going to be using one nginx config file that will allow port 80 and 443 ( must be open to server's firewall to everyone and to router) to :
 
 port 80 is for nginx 
 

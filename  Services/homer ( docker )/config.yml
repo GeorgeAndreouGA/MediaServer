@@ -78,12 +78,4 @@ services:
         target: "_blank"
         tag: "media"
         keywords: "emby,server,video"
-      - name: "Kasm Workspaces"
-        icon: "fas fa-desktop"
-        subtitle: "Secure remote environments"
-        url: "https://server_private_ip:445"
-        target: "_blank"
-        tag: "remote"
-        tagstyle: "is-danger"
-        keywords: "kasm,remote,workspace,desktop,browser"
       #add more services here
