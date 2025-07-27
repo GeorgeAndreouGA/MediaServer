@@ -15,3 +15,13 @@ like our music site ( for the admin ) we are going to be accessing our services 
 For other services the only thing that you have to do is to make the .yaml file ( if running on docker and always on the ports selection in the .yaml file add the private_ip_server:server_host_port:docker_hosst_port) and go to the ( nginx config file for services after-cerbot-ssl-cert) and add the servise ()
 
 For the first servise before you generate an ssl cert with certbot add the nginx conifg( config file for services before-cerbot-ssl-cert ) and after you made an ssl cert change it to ( nginx config file for services after-cerbot-ssl-cert) ( support all the things we set )
+
+
+
+
+
+!!!IMPORTANT!!! if you want to access your services through your_domain_name:8443/service_name rather than private_ip of_server:8443/service_name ( it will still be available only in the local network and only through the ips you've allowed) 
+
+you would have to edit in the host machine and not the server machine ( the nginx config of the server is correct ) : for linux host : " nano /etc/hosts " add this at the bottom : server_ip_and_not_host_ip  your_domain_name 
+
+now from that machine you've edited you can access the your services through the domain_name and keep your access rules.  Also if your router supports it you can add " server_ip_and_not_host_ip  your_domain_name  " in the dns settings of your router. This way you don't have to make changes to /etc/hosts of each client host .it will take please instantly.

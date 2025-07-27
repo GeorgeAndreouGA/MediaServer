@@ -29,7 +29,7 @@
    # This is for the amdin ( admin.html)
   location /admin  {
 
-        allow private_ip;  # Replace with your allowed IP. !!! IMPORTANT !!! The admin panel will be blocked for everyone excepet the ips you allow. YOU HAVE TO USE THE  #PRIVATE IP OF THE SERVER TO HAVE ACCESS TO THE ADMIN FORM THE ALLOWED IPS.ACCESSING THE ADMIN FROM THE DNS YOU GOT,IT WILL BLOCK IT EVEN USING ALLOWED IPS.ONLY #FROM THE SERVER IP WILL WORK.
+        allow private_ip;  # Replace with your allowed IP. !!! IMPORTANT !!! The admin panel will be blocked for everyone excepet the ips you allow. YOU HAVE TO USE THE  #PRIVATE IP OF THE SERVER TO HAVE ACCESS TO THE ADMIN FORM THE ALLOWED IPS.ACCESSING THE ADMIN FROM THE DNS YOU GOT,IT WILL BLOCK IT EVEN USING ALLOWED IPS.ONLY #FROM THE SERVER IP WILL WORK.if you want to access it from your domain and not from the private ip and still keep your access rules go and edit the /etc/hosts from the HOST MACHINE AND NOT FROM THE SERVER and add " server_ip_and_not_host_ip  your_domain_name " . Also if your router supports it you can add " server_ip_and_not_host_ip  your_domain_name  " in the dns settings of your router. This way you don't have to make changes to /etc/hosts of each client host .it will take please instantly.
         allow private_ip;
         allow private_ip;
         deny all;
