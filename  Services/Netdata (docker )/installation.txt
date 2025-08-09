@@ -17,3 +17,5 @@
 
 
  !!!! IMPORTANT !!!! leave the -volumes as is in the .yaml file 
+
+ Also when you go to the site ( see Netdata insterface.png ) click on the " skip and use the dashboard anonymously " . YOU DON'T NEED TO CREATE AN ACCOUNT!!!!
