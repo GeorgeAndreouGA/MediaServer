@@ -29,28 +29,6 @@ b) Docker Compose
 11. curl -sL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o "$HOME/.docker/cli-plugins/docker-compose" && \
 12. chmod +x $HOME/.docker/cli-plugins/docker-compose
 
-OK , now you have Docker Engine and Docker Compose installed. If you want to manage and have control of your container ports e.g if you installed emby via docker ( we did not do that ) that runs on port
-8096 or any other service via docker, you can configure Docker to use your host firewall (e.g., ufw) instead of Docker default iptables rules. We will disable only the docker iptables rules and not the entire iptables service, so you can still use iptables for other purposes.
-
-1. Create or edit the Docker daemon configuration file:
-  sudo nano /etc/docker/daemon.json
-
-2. Add the following content:
-  {
-    "iptables": false
-  }
-
-3. Restart Docker to apply the changes:
-
-  sudo systemctl restart docker
-
-Now, Docker will not modify iptables rules, and you can manage container ports using ufw or your preferred firewall.If you have any containers retart them.
-
-IMPORTANT !!! : after this make sure that both commands return nothing : 1 ) sudo iptables -S | grep DOCKER and 2) sudo iptables -t nat -S | grep DOCKER 
-
-If they do return something, you have to flush the rules and remove them. ( There are many ways to do that but for each system is different )
-
-
 
 
 

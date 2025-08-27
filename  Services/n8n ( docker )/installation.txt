@@ -1,0 +1,14 @@
+create a folder : mkdir /root/Docker/n8n
+
+create  the n8n.yaml file  
+
+After you have the correct .yaml file => docker compose -f /root/Docker/n8n/n8n.yaml up -d # start the container
+
+
+ # make sure the n8n-data privilages are set yourUser:youUser ( use chown ) ( VERY IMPORTANT )  NOT ROOT VERY IMPORTANT
+
+
+ use ls -la to see ownership 
+
+
+ use nxinx config

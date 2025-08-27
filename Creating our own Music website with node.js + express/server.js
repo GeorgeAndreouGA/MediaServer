@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './passwordHash.env' });
+require('dotenv').config();
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 const bcrypt = require('bcrypt');
@@ -10,7 +10,8 @@ const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
 const crypto = require('crypto');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT =  3000;
+const HOST = '127.0.0.1';
 const MUSIC_DIR =  process.env.MUSIC_PATH;
 const PUBLISHED_JSON = path.join(__dirname, 'published.json');
 const SCHEDULED_JSON = path.join(__dirname, 'scheduled.json');
@@ -102,7 +103,7 @@ function releaseDueTracks() {
       dueFiles.push(item.file);
     } else {
       futureList.push(item);
-    }
+   }
   });
 
   if (dueFiles.length > 0) {
@@ -176,10 +177,24 @@ app.use('/admin', adminLimiter, (req, res, next) => {
 app.get('/admin.html', (req, res) => {
   res.redirect('/admin');
 });
+
 // Public homepage
+// Redirect root to canonical /index (use 301 for permanent, change to 302 if you prefer temporary)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'html/index.html'));
+  return res.redirect(301, '/index');
 });
+
+// Serve canonical /index
+app.get('/index', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'html', 'index.html'));
+});
+
+// Canonicalize /index.html -> /index
+app.get('/index.html', (req, res) => {
+  return res.redirect(301, '/index');
+});
+
+
 
 // Admin panel UI with CSRF protection
 app.get('/admin', csrfProtection, (req, res) => {
@@ -319,6 +334,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🎵 EchoRiftSounds server running at http://localhost:${PORT}`);
+app.listen(PORT, HOST,  () => {
+  console.log(`🎵 EchoRiftSounds server runs at cluster mode`);
 });

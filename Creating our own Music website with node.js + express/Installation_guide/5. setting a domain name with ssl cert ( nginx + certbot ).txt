@@ -1,7 +1,7 @@
 
 !!!! IMPORTANT !!!! THIS IS GOING TO BE YOUR LAST STEP 
 
-
+THE SITE IS RUNNING ON LOCALHOST ( SERVER.JS IS CONFIGURED THAT WAY FOR SECURITY ). NOW WE WILL BE USING NGINX ( LIKE DOCKER CONTAINERS)
 
 11. Now we are going to be oppening our website to the internet and creating a valid ssl cert for http with certbot and having nginx as a revrse proxy ( sense both nginx and certbot are listeing to port 80 and no we can't stop nginx and then run certbot to create our ssl cert and then start nginx again because certbot needs that port to renew the ssl certs. So since we already have nginx as a reverse proxy for emby we are going to do the same for our website. No need to go to server.js to add the certbot ssl cert)
 

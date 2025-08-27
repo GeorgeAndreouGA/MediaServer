@@ -10,7 +10,7 @@ services:
     security_opt:
       - apparmor:unconfined
     ports:
-      - "server private ip:port that the server will listen to:19999" # don't change the 1999 port, it is required for Netdata container to work
+      - "127.0.0.1:4000:1999 that the server will listen to:19999" # don't change the 1999 port, it is required for Netdata container to work
     volumes:
       - netdataconfig:/etc/netdata
       - netdatalib:/var/lib/netdata

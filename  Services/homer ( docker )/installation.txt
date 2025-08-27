@@ -7,7 +7,7 @@ In the .yaml we have =>
                                  volumes:
                                 - /root/Docker/homer/config:/www/assets # Make sure your local config directory exists
                                   ports:
-                                - "server's_private_ip:8080:8080"
+                                - "127.0.0.1:8080:8080"
 
 !!! important !!! make sure that they are correct ( like emby )
 

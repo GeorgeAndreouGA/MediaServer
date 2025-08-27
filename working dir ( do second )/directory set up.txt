@@ -8,6 +8,4 @@ Under Docker folder we are going to be placing our docker services with there .y
 
 We are going to store our nginx configs for ssl certs with revers proxy in /etc/nginx/sites-available
 
-We have two sites : one public under 443 ( music site ) and one private under 8443 ( for our servises ( emby etc ....))
-
-The static files for the music site will be under /var/www/sitename , and the .yaml files for our services under the dir we created in the first steps
+!!!!IMPORTANT !!!! for security all of our services will be in docker containers

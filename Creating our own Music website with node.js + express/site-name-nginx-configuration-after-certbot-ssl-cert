@@ -1,0 +1,184 @@
+
+
+##### we have the client only to 443 ( the internet ) and the admin panell to 3003 ( internal port , not internet wide) . both listen to the same port 3000
+#### we also select what paths we server both in the admin and in the client with location / something ( this is very important)
+
+upstream node_cluster {                                                                                      
+    server 127.0.0.1:3000               weight=2 max_fails=3 fail_timeout=30s;                               
+    server 127.0.0.1:3001               max_fails=3 fail_timeout=30s;                                        
+    server 127.0.0.1:3002               max_fails=3 fail_timeout=30s;                                        
+    keepalive 16;                                                                                            
+}                                                                                                            
+                                                                                                             
+                                                                                                             
+                                                                                                             
+ server {                                                                                                    
+    listen 443 ssl http2;                                                                                    
+    server_name  domainname.com;                                                                 
+                                                                                                             
+    ssl_certificate /etc/letsencrypt/live/domainname.com/fullchain.pem;                          
+    ssl_certificate_key /etc/letsencrypt/live/domainname.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;   
+ 
+ 
+ # Secure Headers
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy no-referrer;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()";
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+  
+ # Deny dotfiles (top-level)
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+   # This is for the client ( index.html )
+    location /index {
+        proxy_pass http://node_cluster/index;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+   location  /index.html {
+        return 301 /index;
+    }
+
+
+location /music/ {
+        alias "add the path that the music is located"; 
+     
+    sendfile off;
+    tcp_nopush on;
+    add_header Cache-Control "public, max-age=86400";
+    add_header Accept-Ranges bytes;
+    autoindex off;
+    types {
+        audio/mpeg mp3;
+        audio/wav wav;
+        audio/flac flac;
+    }
+}
+  location /published {
+        proxy_pass http://node_cluster/published.json;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+}
+ 
+  location  /published.json {
+        return 301 /published;
+    } 
+  
+  location / {
+        return 301 /index;
+    }
+
+}
+
+server {
+    listen Server_Ip:3003 ssl http2;
+    server_name domainname.com;  
+
+    ssl_certificate /etc/letsencrypt/live/domainname.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/domainname.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+   
+   # Secure Headers
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy no-referrer;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()";
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+ 
+   # Deny dotfiles (top-level)
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    location /admin  {
+
+        allow    IP_device to allow;
+        # allow .....
+        deny all;
+
+
+        proxy_pass http://node_cluster/admin;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+    }
+
+
+  location  /published {
+        proxy_pass http://node_cluster/published.json;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+ 
+}
+  
+    location  /published.json {
+        return 301 /published;
+    }
+
+    location  /scheduled {
+        proxy_pass http://node_cluster/scheduled.json;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+
+  }
+
+   location  /scheduled.json {
+        return 301 /scheduled;
+    }
+
+  location /music/ {
+        alias "path to your music";
+
+    sendfile off;
+    tcp_nopush on;
+    add_header Cache-Control "public, max-age=86400";
+    add_header Accept-Ranges bytes;
+    autoindex off;
+    types {
+        audio/mpeg mp3;
+        audio/wav wav;
+        audio/flac flac;
+    }
+ }
+
+ location / {
+        return 404;
+    }
+
+}
+
+server {
+    listen 80;
+    server_name domain.com;
+
+
+   # ACME challenge for Certbot:      THIS IS VERY IMPORTANT FOR CERTBOT (you must have it on port 80 ) . Remeber port 80 and 443 MUST BE PORTFORWARTED FROM YOUR ROUTER TO THE INTERNET 
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    return 301 https://$host$request_uri;
+}

@@ -7,7 +7,7 @@
 4.after you copy paste ( set the server's private ip and the port that the server is going to listen to in the yaml file under the ports section )
 
   4.1    ports:
-      - "server private ip:port that the server will listen to:19999" # don't change the 1999 port, it is required for Netdata container to work
+      - "127.0.0.1:yourPort:1999 that the server will listen to:19999" # don't change the 1999 port, it is required for Netdata container to work
 
 5. docker compose -f Netdata.yaml up -d
 
