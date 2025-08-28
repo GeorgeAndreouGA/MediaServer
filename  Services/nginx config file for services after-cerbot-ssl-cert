@@ -49,8 +49,9 @@ server {
 
     location /emby/ {
 
-        allow Ip device to allow;
-        # allow ......
+        allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
         deny all;
 
         proxy_pass         http://127.0.0.1:8096/;   # since we exposed emby container to 127.0.0.1 .
@@ -65,8 +66,9 @@ server {
   location /homer/ {
 
 
-         allow Ip device to allow;
-        # allow ......
+       allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
         deny all;
 
         proxy_pass         http://127.0.0.1:8080/; # since we exposed homer container to 127.0.0.1 .
@@ -81,8 +83,9 @@ server {
   location /monitor/ {
 
 
-         allow Ip device to allow;
-        # allow ......
+        allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
         deny all;
 
         proxy_pass         http://127.0.0.1:4000/;  # since we exposed Netdata container to 127.0.0.1 .
