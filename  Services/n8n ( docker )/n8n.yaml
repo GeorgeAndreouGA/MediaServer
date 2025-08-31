@@ -1,0 +1,34 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - ./n8n-data:/home/node/.n8n    # make sure the n8n-data privilages are set yourUser:youUser ( use chown ) ( VERY IMPORTANT )  NOT ROOT VERY IMPORTANT
+    env_file:
+      - .env
+    environment:
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=${N8N_PORT}
+      - N8N_PROTOCOL=${N8N_PROTOCOL}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL}
+      - N8N_PATH=${N8N_PATH}
+      - N8N_PROXY_HOPS=${N8N_PROXY_HOPS}
+      - N8N_PUSH_BACKEND=${N8N_PUSH_BACKEND}
+
+      - NODE_ENV=${NODE_ENV}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+
+      - N8N_DIAGNOSTICS_ENABLED=${N8N_DIAGNOSTICS_ENABLED}
+      - N8N_TEMPLATES_ENABLED=${N8N_TEMPLATES_ENABLED}
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=${N8N_VERSION_NOTIFICATIONS_ENABLED}
+
+    extra_hosts:
+      - "subdomain.domain.com:private_ip_of_server"   # only if you need to access other services on the host machine ( see the installation.txt )
+    
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"

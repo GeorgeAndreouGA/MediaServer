@@ -1,0 +1,84 @@
+Firewall ( ufw )
+
+. Install UFW 
+
+1. sudo apt update
+2. a) sudo apt install ufw -y b) sudo ufw enable
+
+
+. Default UFW Rules
+
+3. sudo ufw default deny incoming ( deny all listening ports of the server )
+4. sudo ufw default allow outgoing ( allow all incoming internet traffic to the server )
+
+Allow Required Ports ( allow all the ports of the services you have created e.g for emby allow 8096 ect )
+
+
+!!!! IMPORTANT !!!! when having docker container sevices the host firewall ( e.g ufw in this case ) will not block the services because docker HAS IT'S OWN FIREWALL ( IP_TABLES).
+So there are 2 ip_tables : the host and docker 
+In our case when we are going to start a container service we will bind the HOST PORT of the .yaml file to the localhost ( loopback , 127.0.0.1, host machine) and not to the private ip of the server.
+By doing this the service that is running in the container WILL ONLY BE AVAILABLE on the server it self and none else will be able inside the network to access this service.
+IN order to have access to that service to the devices we want we are going to use nginx as a reverse proxy to forward the loopback container services to the the private ip of the 
+server and the whatever avilable port we have  that we want including limiting the access to specific ip's we want to have access to that container service.
+After that we MUST use the host firewall ( ufw ) to allow these services with the nginx port of the service to the specific ip's we want.
+
+By doing this to every container we have a very strong security because the actual port theat the service is running is only exposed to the server it self through localhost and even 
+the the LAN devices can't see.We also don't have to worry about the docker ip_tables . After that nginx and ufw take over.
+
+ !!!WE WILL PORT FORWARD 80 AND 443 AND NOTHING ELSE !!!!!!
+
+e.g 
+
+if you want to allow specic ip's :
+
+5. sudo ufw allow proto <protcol> from <IP_ADDRESS> to any port <PORT_NUMBER> or  sudo ufw limit proto <protcol> from <IP_ADDRESS> to any port <PORT_NUMBER> ( use limit to block Ddos attacks or brute-force)
+
+ <IP_ADDRESS> the ip address that you want to allow to use the port
+
+if you want to allow everyone :
+
+5.1. sudo ufw allow <PORT_NUMBER> 
+
+when you are done restart firewall: 
+
+6. sudo ufw reload
+7. sudo ufw status ( check rules )
+
+
+SEE " ufw_example (ONLY NGINX PORTS AND NOT CONTAINER HOST PORTS).png "   
+
+As you can see i am only exposing to my lan network ( no to the internet ) ports :
+
+8443 : it is through nginx for our servises ( except n8n )
+
+22 : for ssh and sftp
+
+8444: for n8n
+
+3003: admin panel for music site ( not the client )
+
+
+exposed to the internet :
+
+80 : nginx and certbot
+
+443 : music client website
+
+
+
+for my services i use one domain and have many services under the port 8443 exept n8n wich is on port 8444.
+
+for my music site i have another domain on port 443 for the client and an internal one on port 3003 ( internal one ) for the admin   . THIS IS ONE SITE RUNNONG ON 127.0.0.1:3000
+
+in the png you can see same ports 3 times because i am allowing each ip device i want to access that port/service under nginx. (in red there are the PRIVATE IP'S)
+
+
+IF WE TRY IP_SERVER:HOST_PORT ( e.g IP_SERVER:3000 (music site ) or IP_SERVER:8096 (emby), on a whitelisted device we won't have access because the host ports work ONLY ON THE ACTUAL SERVER ( 127.0.0.1))
+
+IN the nginx config we have "  listen Server_Ip:" PORT OF UFW TO CONTROLL AND LAN LISTEN "  ssl http2; "  and in the location /emby ( for e.g ) we have " http://127.0.0.1:8096/ " ON THE SAME SERVER BLOCK. see nginx config .
+
+IN THE END WE GO THROUGH NGINX ( FIRST FILTERING ) AND THEN TROUGH UFW ( SECOND FILTERING ) 
+
+!!! WE ONLY PORT FORWARD 80 AND 443 TO THE ROUTER . THE OTHER NGINX PORTS I CAN ACCESS THEM TROUGH ZEROTIER VPN !!!
+
+THE ADMIN PANEL OF THE MUSIC SITE HAS 3 THINGS ( NGINX FILTERING PORT 3003 , UFW FILTERING , AND IN THE SERVER.JS THE IP FILTERING THROUGH THE .ENV)

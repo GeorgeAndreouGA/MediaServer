@@ -1,0 +1,44 @@
+
+
+
+THE SITE AND SERVICES ARE  RUNNING ON LOCALHOST THROUGTH THE YAML FILES . NOW WE WILL BE USING NGINX 
+
+11. Now we are going to be oppening our website  to the internet and our services to our LAN  and creating a valid ssl cert for http with certbot and having nginx as a revrse proxy ( sense both nginx and certbot are listeing to port 80 and no we can't stop nginx and then run certbot to create our ssl cert and then start nginx again because certbot needs that port to renew the ssl certs. So since we already have nginx as a reverse proxy for emby we are going to do the same for our website. No need to go to server.js to add the certbot ssl cert)
+
+11.1 Get a domain name ( if you want to get a free on you can go to https://www.duckdns.org/ it is a ddns service that keeps track of your dynamic public ip. Follow the guide to install it on your server)
+
+!!! important !!!  in the crontab -e ( root ) add the full path /root/duckdns/duck.sh      ( don't add the one that  https://www.duckdns.org/ )
+
+
+11.2 Port Forwarding  , On your home router:
+
+Forward port 80 → ( for certbot)
+
+Forward port 443 → ( for our https website)
+
+11.3 Server's firewall : Make sure that you have port 80 and 443 open on your server's firewall to everyone.
+
+11.4 sudo apt install certbot python3-certbot-nginx nginx ( we are installing a defferent vertion of certbot that is compatible with nginx)
+
+11.5 sudo nano /etc/nginx/sites-available/sitename 
+
+  !!! IMPORTANT !!! place the " site-name-nginx-configuration-before-certbot-ssl-cert.txt " 
+
+
+11.6 sudo ln -s /etc/nginx/sites-available/sitename /etc/nginx/sites-enabled/
+     sudo nginx -t  # test config
+     sudo systemctl reload nginx
+
+11.7 sudo certbot --nginx -d yourname.com ( Run Certbot to install HTTPS certificate )
+
+11.8 Great now you can access your website with https for around the world.
+
+!!! IMPORTANT !!! IF YOU WANT YOU CAN REPLACE THE nginx site config in " /etc/nginx/sites-available/sitename " with the " site-name-nginx-configuration-after-certbot-ssl-cert.txt " ( better security )
+
+11.9 sudo certbot renew --force-renewal ( make sure that it does not fail to renew the ssl cert)
+
+11.10 systemctl list-timers | grep certbot ( check when certbot will check the ssl for renewal)
+
+11.11 certbot autorenews the certs autmaticly just make sure that nginx starts after reboots
+
+!!!! Follow THE NGINX CONFIGS FOR BOTH THE SITE AND THE SEVICES .!!!!!! PORT FORWARD ONLY PORT 80 AND PORT 443!!!!!!!!

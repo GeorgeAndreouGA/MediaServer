@@ -1,0 +1,27 @@
+for our services for ssl certs and reverse proxing we are going to be using one nginx config file that will allow port 80 and 443 ( must be open to server's firewall to everyone and to router) to :
+
+port 80 is for nginx 
+
+port 443 is for certbot ssl autorenew and website.
+
+This port must be open and  included to the nginx cofig file ( nginx config file for services after-cerbot-ssl-cert )
+
+But since we want our servises to be running locally we are going to be forwading through the nginx config file our domain to a close port ( 8443 , that must be allowed on the server;s firewall to the ips that you whant to access the services ( not to everyone ) but we will not port forward it to the router.)
+
+This way we are going to be autorenwing our site cert through 443 ( certbot ) , nginx will be using port 80 and we are going to be using the close port 8443 for our services ( we can access them in the network or through vpn ( make the correct  changes to the serve's firewall and to the nginx config.)).
+
+like our music site ( for the admin ) we are going to be accessing our services through the private_ip of_server:8443/service_name ( for the admin of the music website is private_ip of_server:443/admin but we can skip the 443 because is the base port of the ssl cert but for our servises we have to put the 8443 ) 
+
+For other services the only thing that you have to do is to make the .yaml file ( if running on docker and always on the ports selection in the .yaml file add the private_ip_server:server_host_port:docker_hosst_port) and go to the ( nginx config file for services after-cerbot-ssl-cert) and add the servise ()
+
+For the first servise before you generate an ssl cert with certbot add the nginx conifg( config file for services before-cerbot-ssl-cert ) and after you made an ssl cert change it to ( nginx config file for services after-cerbot-ssl-cert) ( support all the things we set )
+
+
+
+
+
+!!!IMPORTANT!!! if you want to access your services through your_domain_name:8443/service_name rather than private_ip of_server:8443/service_name ( it will still be available only in the local network and only through the ips you've allowed) 
+
+you would have to edit in the host machine and not the server machine ( the nginx config of the server is correct ) : for linux host : " nano /etc/hosts " add this at the bottom : server_ip_and_not_host_ip  your_domain_name 
+
+now from that machine you've edited you can access the your services through the domain_name and keep your access rules.  Also if your router supports it you can add " server_ip_and_not_host_ip  your_domain_name  " in the dns settings of your router. This way you don't have to make changes to /etc/hosts of each client host .it will take please instantly.

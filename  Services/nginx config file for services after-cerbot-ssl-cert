@@ -1,0 +1,169 @@
+
+server {
+    listen 80;
+    server_name domainnaim.com;
+
+    # ACME challenge for Certbot:    THIS IS VERY IMPORTANT FOR CERTBOT (you must have it on port 80 ) . Remeber port 80 and 443 MUST BE PORTFORWARTED FROM YOUR ROUTER TO THE INTERNET 
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    # Everything else → HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name domainnaim.com;
+
+    ssl_certificate     /etc/letsencrypt/live/domainnaim.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/domainnaim.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Your public‑facing site content
+ return 404;
+}
+
+# ───────────────────────────────────────────────────────────────────────────────
+# 2) Internal‑only proxy on Server_Ip:8443
+# ───────────────────────────────────────────────────────────────────────────────
+server {
+    # Bind only to LAN IP on port 8443
+    listen Server_Ip:8443 ssl http2; # IMPORTANT PART !!!! ADD YOUR PRIVATE IP AND THE PORT YOU WANT ( WE WILL CONTROLL THROUGH UFW)
+    server_name domainnaim.com;  
+
+    ssl_certificate     /etc/letsencrypt/live/domainnaim.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/domainnaim.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+  # Deny dotfiles (top-level)
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    location /emby/ {
+
+        allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
+        deny all;
+
+        proxy_pass         http://127.0.0.1:8096/;   # since we exposed emby container to 127.0.0.1 .
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   Connection        "";
+    }
+
+  location /homer/ {
+
+
+       allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
+        deny all;
+
+        proxy_pass         http://127.0.0.1:8080/; # since we exposed homer container to 127.0.0.1 .
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   Connection        "";
+    }
+
+  location /monitor/ {
+
+
+        allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
+        deny all;
+
+        proxy_pass         http://127.0.0.1:4000/;  # since we exposed Netdata container to 127.0.0.1 .
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   Connection        "";
+    }
+
+  #Add services here
+
+
+
+
+
+ location / {    #   This should be last because it blocks whatever is not in location / ....
+        return 404;
+    }
+
+}
+
+# n8n - Secure reverse proxy configuration      !!!!IMPORTANT !!!! n8n is pain in the a$$ to set up so copy-paste this exact nginx config 
+server {                                        # if you have have a domain only you MUST ALSO GET A SUBDOMAIN AND LINK IT TO YOUR DOMAIN (n8n needs it )
+    listen Server_Ip:8444 ssl http2;             # since we are using duckdns to get our domain we also have a subdomain.  
+    server_name subdomain.domain.com;           # e.g https://yourchose.duckdns.org    //// the " yourchose " is the subdomain and the duckdns.org is the domain . so google.com is a domain name 
+                                                # for the other services we seted up we don't care . we can have a subdomain or not !!!!
+    # SSL Configuration
+    ssl_certificate     /etc/letsencrypt/live/subdomain.domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/subdomain.domain.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Timeouts for n8n long-running workflows
+    proxy_read_timeout  86400s;
+    proxy_send_timeout  86400s;
+    proxy_connect_timeout 120s;
+
+    # File upload size
+    client_max_body_size 50M;
+
+    # Access Control - Only allow specific IPs
+    location / {
+
+         allow     Ip device to allow;   
+        # allow ......
+        deny all;
+
+        # Proxy to n8n container
+        proxy_pass         http://127.0.0.1:5678/;   # since we exposed n8n container to 127.0.0.1 .
+        proxy_http_version 1.1;
+
+        # Essential headers for n8n
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+        proxy_set_header   X-Forwarded-Host  subdomain.domain.com;
+        proxy_set_header   Origin            https://subdomain.domain.com;
+        
+        # WebSocket support for n8n real-time features
+        proxy_set_header   Upgrade           $http_upgrade;
+        proxy_set_header   Connection        "upgrade";
+        proxy_set_header   X-NginX-Proxy     true;
+
+        # Disable buffering for real-time responses
+        proxy_buffering    off;
+        proxy_redirect     off;
+        
+        # Additional headers for better compatibility
+        proxy_set_header   X-Forwarded-Port  8444;
+        proxy_set_header   X-Forwarded-Ssl   on;
+    }
+
+    # Security headers
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+}
+   

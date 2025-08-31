@@ -1,0 +1,21 @@
+1.create a dir => /root/Docker/Netdata
+
+2.cd /root/Docker/Netdata
+
+3. create a Netdata.yaml 
+
+4.after you copy paste ( set the server's private ip and the port that the server is going to listen to in the yaml file under the ports section )
+
+  4.1    ports:
+      - "127.0.0.1:yourPort:1999 that the server will listen to:19999" # don't change the 1999 port, it is required for Netdata container to work
+
+5. docker compose -f Netdata.yaml up -d
+
+ 6. Now make changes to the nginx  ( config file for services after-cerbot-ssl-cert )
+
+ Done!!!!
+
+
+ !!!! IMPORTANT !!!! leave the -volumes as is in the .yaml file 
+
+ Also when you go to the site ( see Netdata insterface.png ) click on the " skip and use the dashboard anonymously " . YOU DON'T NEED TO CREATE AN ACCOUNT!!!!

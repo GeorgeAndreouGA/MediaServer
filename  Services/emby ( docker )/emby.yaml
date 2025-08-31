@@ -1,0 +1,21 @@
+services:
+  emby:
+    image: emby/embyserver_arm64v8:latest # get the latest version from https://hub.docker.com/r/emby/   choosing the right architecture
+    container_name: embyserver
+    hostname: your_hostname
+    environment:
+      - UID=1000 
+      - GID=100 
+      - GIDLIST=100 
+    volumes:
+      - /root/Docker/emby/config:/config # Configuration directory !!! important !!! the /root/Docker/emby/config will be created automatically on the directory where we seted up the emby.yaml file.    the /config directory is where the /root/Docker/emby/config will be mounted in the docker container 
+      - /path/to/your_media:/mnt/media  # Media directory    !!! important !!! the /path/to/your_media is where you containt is located on your server. CHANGE IT TO YOUR MEDIA DIRECTORY ( you can mount the entire /media directory if you want to ) . It will be mounted in the docker container to /mnt/media
+    ports:
+      - "127.0.0.1:8096:8096" # the right port is the containers port . YOU NEVER CHANGE THAT ONLY THE LEFT PORT YOU ONE TO EXPOSSE ON YOU HOST ( your server )  !!!IMPORTANT !!! localhost only !!!!    hostPort:containerPort 
+    devices:
+      - /dev/dri:/dev/dri 
+      - /dev/vchiq:/dev/vchiq  Raspberry Pi (this is for arm64v8 architecture)
+    restart: unless-stopped  # start the container after reboots
+
+
+# if you want DLNA support see documantation of emby ( you have to enable it in the emby settings AND )

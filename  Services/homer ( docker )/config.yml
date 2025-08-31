@@ -1,0 +1,119 @@
+---
+# Homepage configuration
+# See https://fontawesome.com/search for icons options
+
+# Optional: Use external configuration file.
+# Using this will ignore remaining config in this file
+# externalConfig: https://example.com/server-luci/config.yaml
+
+title: "App dashboard"
+subtitle: "Homer"
+# documentTitle: "Welcome" # Customize the browser tab text
+logo: "assets/yourImage"
+# Alternatively a fa icon can be provided:
+# icon: "fas fa-skull-crossbones"
+
+header: true # Set to false to hide the header
+# Optional: Different hotkey for search, defaults to "/"
+# hotkey:
+#   search: "Shift"
+footer: '<p>MyFatNas</p>' 
+
+columns: "3" # "auto" or number (must be a factor of 12: 1, 2, 3, 4, 6, 12)
+connectivityCheck: true # whether you want to display a message when the apps are not accessible anymore (VPN disconnected for example).
+                        # You should set it to true when using an authentication proxy, it also reloads the page when a redirection is detected when checking connectivity.
+
+
+# Set the default layout and color scheme
+defaults:
+  layout: columns # Either 'columns', or 'list'
+  colorTheme: auto # One of 'auto', 'light', or 'dark'
+
+# Optional theming
+theme:  default # 'default' or one of the themes available in 'src/assets/themes'.
+
+colors:
+  light:
+    highlight-primary: "#3367d6"
+    highlight-secondary: "#4285f4"
+    highlight-hover: "#5a95f5"
+    background: "#f5f5f5"
+    card-background: "#ffffff"
+    text: "#363636"
+    text-header: "#424242"
+    text-title: "#303030"
+    text-subtitle: "#424242"
+    card-shadow: rgba(0, 0, 0, 0.1)
+    link: "#3273dc"
+    link-hover: "#363636"
+    background-image: "/assets/your/light/bg.png" # prefix with your sub subpath if any (ex: /homer/assets/...)
+  dark:
+    highlight-primary: "#3367d6"
+    highlight-secondary: "#4285f4"
+    highlight-hover: "#5a95f5"
+    background: "#131313"
+    card-background: "#2b2b2b"
+    text: "#eaeaea"
+    text-header: "#ffffff"
+    text-title: "#fafafa"
+    text-subtitle: "#f5f5f5"
+    card-shadow: rgba(0, 0, 0, 0.4)
+    link: "#3273dc"
+    link-hover: "#ffdd57"
+    background-image: "/assets/your/dark/bg.png" # prefix with your sub subpath if any (ex: /homer/assets/...)
+
+links:
+  - name: "github_repo"
+    icon: "fab fa-github"
+    url: "your-github-repo-url"
+    target: "_blank" # optional html tag target attribute
+
+services:
+  - name: "App Dashboard"
+    icon: "fas fa-th-large"
+    items:
+      - name: "Emby"
+        icon: "fas fa-film"
+        subtitle: "Media Server"
+        url: "https://domainname.com:8443/emby/"   # if you use my nginx config  =
+        target: "_blank"
+        tag: "media"
+        keywords: "emby,server,video"
+      - name: "ZeroTier"
+        icon: "fas fa-network-wired"
+        subtitle: "VPN & SDN"
+        url: "https://www.zerotier.com/"
+        target: "_blank"
+        tag: "network"
+        keywords: "vpn,zerotier,sdn"
+      - name: "Netdata"
+        icon: "fas fa-jelly-duo fa-regular fa-desktop"
+        subtitle: "server-monitoring"
+        url: "https://domainname.com:8443/monitor/"
+        target: "_blank"
+        tag: "monitor"
+        keywords: "linux-server-monitoring"
+      - name: "n8n"
+        icon: "fa-solid fa-hexagon-nodes"
+        subtitle: "automation"
+        url: "https://domainname.com:8444"
+        target: "_blank"
+        tag: "automation"
+        keywords: "linux-server-automation"
+  - name: "Music Dashboard"
+    icon: "fas fa-th-large"
+    items:
+      - name: "echoriftsounds client website"
+        icon: "fas fa-music"
+        subtitle: "Audio Streaming"
+        url: "https://domainname.com/"
+        target: "_blank"  
+        tag: "audio"
+        keywords: "music,streaming"
+      - name: "echoriftsounds admin panel"
+        icon: "fa-solid fa-user-tie"
+        subtitle: "Admin Panel"
+        url: "https://domainname.com:3003/admin"
+        target: "_blank"  
+        tag: "audio"
+        keywords: "music,streaming"

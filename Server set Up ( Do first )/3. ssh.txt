@@ -1,0 +1,41 @@
+SSH
+ 
+. Install SSH
+
+1. a) sudo apt install ssh , b) sudo systemctl start ssh , c) sudo systemctl enable ssh
+
+You can now ssh to the server with the user that is not forced to sftp only. Meaning the first user you created when installed the os ( If you followed the SFTP guide )
+
+1.1 In /etc/ssh/sshd_config set : " PermitRootLogin no " ( the root can't ssh ) and " PasswordAuthentication yes " the users can login with there password.
+ 
+. Access the server ( the password will be the same for the user without the sftp only. )
+
+2. ssh <name of the user that has no sftp access only>@<your static ip address> 
+
+
+. For better security use a firewall ( ufw , see other documantation) , PAM and AllowUsers to the sshd_config file of ssh 
+
+1. AllowUsers to the sshd_config ( IMPORTANT!!!!! AllowUsers must be BEFORE the " Match User <sftpuser> ..... " ( step 5.2 in the sftp.md )  ): 
+
+ 1.1 In  /etc/ssh/sshd_config at the buttom add :  AllowUsers username@private_ip    ( This will allow only the ip's you want to ssh to the user)  
+
+2. firewall ( ufw , see other documantation)
+
+3. PAM :
+   
+   3.1 : In /etc/ssh/sshd_config : UsePAM yes
+
+   3.2 : In /etc/security/access.conf :
+   
+        + : username : private_ip or private_ip's      ( the + is to allow the username to be accessed only by the ip's you want )
+        - : ALL : ALL   (THIS MUST BE AT THE END OF ALL OTHER USERS YOU'VE ADDED ABOVE)
+
+
+     
+   3.3 : In /etc/pam.d/sshd :   account required pam_access.so
+
+   3.4   In /etc/pam.d/login : account required pam_access.so
+
+sudo systemctl restart ssh
+
+3 way security for ssh

@@ -1,0 +1,9 @@
+now that we have done the " Server set Up " we are going to create our directory that our services will be in when using docker services!!!
+
+since we are working with the root user : mkdir /root/Docker
+
+Under Docker folder we are going to be placing our docker services with there .yaml files. ( emby , homer , our music site ect ....)
+
+We are going to store our nginx configs for ssl certs with revers proxy in /etc/nginx/sites-available
+
+!!!!IMPORTANT !!!! for security all of our services will be in docker containers

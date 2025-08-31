@@ -1,0 +1,21 @@
+This is a retro music website running in a docker container. we have :
+
+yourSiteName-development = It has the all the files of the code and the files for docker so that you can build the container yourself 
+
+yourSiteName-production = it has the latest image from the production version in a .tar file ( create the .tar from the development with " docker save -o yourName.tar yourName:latest " ). So you just " docker load -i  echoriftsounds.tar " and the image is installed.
+                          Then you can change the .yml file for the "yourName" and set the veriables in the .env . Then just " docker compose up -d " and access the 
+                          client site from : yourdomain   and the amdin panel form : yourdomain:3003/admin ( see the nginx config )
+
+
+Like our other services it runs on localhost so we use nginx for the domain 
+
+in the .env you MUST insert a hashed password to access the admin panel so use the " generate-hash.js " ( set the username for the amdin panel also ) 
+
+
+IF THE IMAGE IS LOST YOU WILL HAVE TO GO BACK TO THE SORCE ( yourSiteName-development ) TO REBUILD EVERYTHING. YOU CAN MAKE YOUR IMAGE .TAR with
+" docker save -o yourName.tar yourName:latest " after you 've  " docker compose up -d " ( this is for the yourSiteName-development). after that you " docker load -i  yourName.tar "
+
+
+
+you don't need the development to run the site . you can use the production that will bulid the container and have already the source code inside it . i am just also giving you 
+the production so that you can understant HOW TO BUILD A CONTAINER .

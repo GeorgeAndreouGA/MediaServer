@@ -1,0 +1,25 @@
+services:
+  yourName:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yourName:latest
+    container_name: yourName-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    environment:
+      - TZ=yourTimeZone e.g. Europe/London
+    volumes:
+      # Mount your music directory
+      - yourMusicDir:/app/music:ro
+    networks:
+      - yourNetwork-network
+
+networks:
+  yourName-network:
+    name: yourNetwork-network
+    driver: bridge
+
