@@ -19,3 +19,7 @@ IF THE IMAGE IS LOST YOU WILL HAVE TO GO BACK TO THE SORCE ( yourSiteName-develo
 
 you don't need the development to run the site . you can use the production that will bulid the container and have already the source code inside it . i am just also giving you 
 the production so that you can understant HOW TO BUILD A CONTAINER .
+
+
+
+THE PERMITIONS OF THE FOLDERS MUST BE 755 AND FOR THE FILES 644 both inside and outside ( host ) of the container

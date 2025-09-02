@@ -1,0 +1,64 @@
+
+
+
+THE SITE AND SERVICES ARE  RUNNING ON LOCALHOST THROUGTH THE YAML FILES . NOW WE WILL BE USING NGINX 
+
+11. Now we are going to be oppening our website  to the internet and our services to our LAN  and creating a valid ssl cert for http with certbot and having nginx as a revrse proxy ( sense both nginx and certbot are listeing to port 80 and no we can't stop nginx and then run certbot to create our ssl cert and then start nginx again because certbot needs that port to renew the ssl certs. So since we already have nginx as a reverse proxy for emby we are going to do the same for our website.)
+
+11.1 Get a domain name ( from cloudflare because it provides protection from Ddos attacks and more .... )
+     
+     get the api token and the zone id for the domain on the cloudflare site , add it to the .sh script ( see directory set up.txt) and
+     
+     on the cloudflare site go to the DNS -> RECORDS section and create a record. -> TYPE : A , NAME: @ ( the root , will show your domain ),COCNTENT: give your Current public ip
+
+     ( it will be updated through the script ) PROXY STATUS : ON ( you will see an orange cloud ) and TTL: AUTO
+    
+    The AAAA record is for ipv6
+
+    IF you want a subdomain ( n8n needs it ) just create another record :  TYPE : CNAME , NAME: yoursubdomain ( give your subdomain ),TARGET: give your  domain
+
+     PROXY STATUS : ON ( you will see an orange cloud ) and TTL: AUTO
+
+Now go to crontab -e on your server :
+!!! important !!!  in the crontab -e ( root ) add the full path e.g /root/clouflare/yourdomain.sh .
+
+so it should be like this for one domain : */5 * * * * /root/cloudflare/domain.sh >> /root/cloudflare/domain.log 2>&1
+
+ensure that on the cloutflare site " always use https " is on. Play freely with the security settings. Now we will be using certbot for ssl 
+
+11.2 Port Forwarding  , On your home router:
+
+Forward port 80 → ( for certbot)
+
+Forward port 443 → ( for our https website)
+
+11.3 Server's firewall : Make sure that you have port 80 and 443 open on your server's firewall to everyone.
+
+11.4 sudo apt install certbot python3-certbot-nginx nginx ( we are installing a defferent vertion of certbot that is compatible with nginx)
+
+11.5 sudo nano /etc/nginx/sites-available/sitename 
+
+  !!! IMPORTANT !!! place the " site-name-nginx-configuration-before-certbot-ssl-cert.txt " 
+
+
+11.6 sudo ln -s /etc/nginx/sites-available/sitename /etc/nginx/sites-enabled/
+     sudo nginx -t  # test config
+     sudo systemctl reload nginx
+
+11.7 sudo certbot --nginx -d yourname.com ( Run Certbot to install HTTPS certificate )
+
+11.8 Great now you can access your website with https for around the world.
+
+!!! IMPORTANT !!! IF YOU WANT YOU CAN REPLACE THE nginx site config in " /etc/nginx/sites-available/sitename " with the " site-name-nginx-configuration-after-certbot-ssl-cert.txt " ( better security )
+
+11.9 sudo certbot renew --force-renewal ( make sure that it does not fail to renew the ssl cert)
+
+11.10 systemctl list-timers | grep certbot ( check when certbot will check the ssl for renewal)
+
+sudo certbot certificates  ( to list all certs )
+
+sudo certbot delete --cert-name nameofthecertyouwantodelete
+
+11.11 certbot autorenews the certs autmaticly just make sure that nginx starts after reboots
+
+!!!! Follow THE NGINX CONFIGS FOR BOTH THE SITE AND THE SEVICES .!!!!!! PORT FORWARD ONLY PORT 80 AND PORT 443!!!!!!!!
