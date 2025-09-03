@@ -1,0 +1,9 @@
+unzip the .tar to install the image ( create the .tar
+from the development with " docker save -o yourName.tar yourName:latest " and move it folder of the production) : docker load -i  yourName.tar
+
+change the values of the .env and see the .yml file
+
+get the container up and running: docker compose up -d
+
+i can't upload the .tar because github won't let me 
+
