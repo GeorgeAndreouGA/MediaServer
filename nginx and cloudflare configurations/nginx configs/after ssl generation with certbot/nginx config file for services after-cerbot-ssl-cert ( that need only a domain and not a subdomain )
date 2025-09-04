@@ -47,9 +47,30 @@ server {
         log_not_found off;
     }
 
+   
+   
+     location / {    # for dockge don't use /dockge/ because it won't work . 
+
+         allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #n8n container subnet ( see n8n installation.txt) 
+         # allow ......
+        deny all;
+
+        proxy_pass         http://127.0.0.1:8000/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_set_header   Connection        "";
+   
+    }
+
+   
+   
     location /emby/ {
 
-        allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
+         allow #Ip device  you want to have access (could be vpn subnet or internal static ip of phone );
          allow #n8n container subnet ( see n8n installation.txt) 
          # allow ......
         deny all;
@@ -99,13 +120,6 @@ server {
 
   #Add services here
 
-
-
-
-
- location / {    #   This should be last because it blocks whatever is not in location / ....
-        return 404;
-    }
 
 }
 
