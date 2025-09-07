@@ -25,3 +25,6 @@ For the first servise before you generate an ssl cert with certbot add the nginx
 you would have to edit in the host machine and not the server machine ( the nginx config of the server is correct ) : for linux host : " nano /etc/hosts " add this at the bottom : server_ip_and_not_host_ip  your_domain_name 
 
 now from that machine you've edited you can access the your services through the domain_name and keep your access rules.  Also if your router supports it you can add " server_ip_and_not_host_ip  your_domain_name  " in the dns settings of your router. This way you don't have to make changes to /etc/hosts of each client host .it will take please instantly.
+
+
+If you can't do neither of these you can access them via : https://server_private_ip:port/path_to_service   ( you must use a reverse proxy ) !!!!

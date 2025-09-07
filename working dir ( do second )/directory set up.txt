@@ -24,3 +24,4 @@ for every subdomain you create for a domain e.g first.domain.com , second.domain
 for each one . These is because when you generate an ssl cert from certbot it only generates for the domain.com and not for the *.domain.com 
 
 * ( being the subpath)
+
