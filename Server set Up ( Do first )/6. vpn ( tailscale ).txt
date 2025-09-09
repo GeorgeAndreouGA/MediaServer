@@ -1,0 +1,111 @@
+Install Vpn ( Access your home network with the services of your server from everywhere )
+
+Install tailscale on linux server : 
+
+1.go to tailscale and create an account 
+
+2. add the linux server to tailscale account by selecting " linux "
+
+3. copy paste the command that it will give you the the linux server terminal
+
+4. on the tailscale site go to your linux server and disable " key expiry " ( do this for the clients also)
+
+5. on the tailscale site go to settings -> device managment -> and enable " Device approval "
+
+6. once installed we are going to configure the linux server to have " ip forwarding " 
+in order to be able to to access our services using the "private_ip of the server" and not 
+the virtual one that tailscale will give us . So in general we are going to " allow all traffic 
+to pass trough tailscale " in order to access our LAN network ( we can access services that are not 
+ on the server but also in our LAN e.g printer ,router webiste , ps4 remode play etc....)
+
+7. if your Linux system has a /etc/sysctl.d directory, use:
+
+   . echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
+
+   . sudo sysctl -p /etc/sysctl.d/99-tailscale.conf
+                
+               Otherwise, use:
+
+   . echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+
+   . sudo sysctl -p /etc/sysctl.conf
+
+ 
+ 8. IF you are using ufw firewall :
+    
+   . sudo nano /etc/default/ufw   :   Find: DEFAULT_FORWARD_POLICY="DROP" Change it to:    DEFAULT_FORWARD_POLICY="ACCEPT"
+
+   . sudo nano /etc/ufw/before.rules : add this at the top (before the *filter rules):
+
+               *nat
+               :POSTROUTING ACCEPT [0:0]
+               -A POSTROUTING -s 100.64.0.0/10 -o <your_network_interface> -j MASQUERADE
+               COMMIT  
+      
+    !!!!IMPORTANT !!!! the 100.64.0.0/10 is the range of ips that tail scale gives !!! Don't change it 
+  
+   . In the samfe config file ( /etc/ufw/before.rules  )  add this after the  *filter rules: 
+         
+         -A FORWARD -i tailscale0 -o <your_network_interface> -j ACCEPT
+         -A FORWARD -i eth0 -o tailscale0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+    # check if applied ( you shoud see somthing like :  0     0 MASQUERADE  0    --  *      eth0    100.64.0.0/10        0.0.0.0/0)      
+     sudo iptables -t nat -L -n -v
+   ##################################################
+    
+   . sudo ufw allow from 100.64.0.0/10 to any port <your services port proto <protocol>
+    
+
+   . sudo ufw reload
+
+
+9.  UDP GRO forwarding  
+
+    . sudo ethtool -K <your_network_interface> rx-udp-gro-forwarding on rx-gro-list off
+
+    .  Get connection name: nmcli -t -f NAME,DEVICE connection show --active
+                          
+                            THEN 
+
+         sudo nmcli connection modify "connection name " ethtool.feature-rx-udp-gro-forwarding on
+         sudo nmcli connection modify "connection name " ethtool.feature-rx-gro-list off
+
+
+    . restart : sudo nmcli connection down "connection name" && sudo nmcli connection up "connection name"
+         
+       Verify Settings
+  
+
+       . nmcli connection show "Wired connection 1" | grep ethtool
+
+       . ethtool -k eth0 | grep -E "udp-gro-forwarding|gro-list"
+
+
+10.    . sudo systemctl restart tailscaled
+        
+       . tailscale status
+
+
+NOW WE'VE SUCCESSFULY ENABLED IP FORARDING.
+
+
+
+
+next step we are enabling the " exit node " and " subnet route " : . tailscale up --advertise-exit-node --advertise-routes=< subnet of your server's private ip . e.g 192.168.10.0/24 >
+
+go to the site and approve the 2 settings on the linux server.
+
+IN THE TAILSCLAE SITE IT MITE SHOW A WARNING THAT IT IS NOT ENABLED . THE REASON IS THAT WE DID NOT DO IT FOR THE IPv6 . WE DON'T NEED IT 
+
+In your nginx config you should allow the 100.64.0.0/10 ip range for every service for the vpn
+
+DONE!!!
+
+
+for the clients just install tailscale and once you've logged in to your tailscale account and approved them
+you should the linux server as " exit node " 
+
+DONE!!!!
+
+
+IN THE SIDE DISABLE ALSO THE tailscale ssh . we don't need it because we can ssh through port 22
