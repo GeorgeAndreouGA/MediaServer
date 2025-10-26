@@ -1,51 +1,26 @@
-#  Static IP Configuration on Linux:
+#  How to Set a Static IP via the Router (DHCP Reservation)
 
-!! IMPORTANT !!
+Log into your router
 
-This method may vary depending on the Linux distribution you are using.
-Please refer to the official documentation of your specific distribution for setting a static IP.
-This is a general method for Debian-based systems using /etc/network/interfaces.
+Look for something like “DHCP Reservation,” “Static Leases,” “Address Reservation.”, etc.....
 
-In a terminal ( the numbers are the commands ):
+Find its MAC address of your pi (on the Pi, run ip link and look for eth0 or wlan0) or check the router’s connected devices list.
 
-. Find your network interface and current IP address
+Create a DHCP reservation
 
-1. ip a
+Assign the Pi a fixed IP address within your LAN range.
 
-a) Identify the interface that provides your internet connection (e.g., eth0, enp0s3).
+Map this IP to the Pi’s MAC address.
 
-b) Note the current IP address assigned to that interface. You will use this or another free IP address on your network.
+Save/apply changes on the router
 
-. Edit the interfaces configuration file
 
-2. sudo nano /etc/network/interfaces
 
-Add the following configuration (replace placeholders with your details):
-
-auto <interface>
-iface <interface> inet static
-    address <static-ip-address>
-    netmask <netmask>
-    gateway <gateway-ip>
-    dns-nameservers <primary-dns> <secondary-dns>
-
-Replace <interface> with the name you found in step 1 (e.g., eth0).
-
-Use a static IP address that is free and valid in your network.
-
-Set the netmask according to your network class (e.g., 255.255.255.0 for a class C network).
-
-The gateway is usually your router’s IP address (e.g., 192.168.1.1).
-
-For DNS servers, you can use your gateway IP as primary DNS and a public DNS like 8.8.8.8 as secondary.
-
-Save and exit the editor (in nano: CTRL+O then ENTER, then CTRL+X).
-
-. Restart the networking service to apply changes:
+. From pi restart the networking service to apply changes or reboot the system ( unplug and plug ):
 
 3. sudo systemctl restart networking
 
-. Reboot the system to ensure everything loads properly:
+. Reboot the system to ensure everything loads properly ( if not already reboot ) :
 
 4. sudo reboot
 
@@ -53,3 +28,33 @@ Save and exit the editor (in nano: CTRL+O then ENTER, then CTRL+X).
 
 5. ip a
 
+
+
+
+Why This is the Best Option ( instead of giving from the host itself ( prevends " floating IP " ) )
+
+Centralized management
+
+The router controls all IP assignments; easier to manage multiple devices.
+
+Avoids IP conflicts
+
+No risk of accidentally assigning an IP already used by another device.
+
+Easy to change later
+
+You can reassign IPs from the router without touching the device.
+
+Works on all devices
+
+Especially useful if you switch the OS or network settings — the Pi always gets the same IP.
+
+No need to configure each device manually
+
+Reduces human error and configuration complexity.
+
+Compatible with DHCP
+
+Devices still technically use DHCP; the “static” assignment is handled centrally.
+
+!!!! IMPORTANT !!!! THE DEVICE WILL BE USING DHCP AND NOT STATIC
