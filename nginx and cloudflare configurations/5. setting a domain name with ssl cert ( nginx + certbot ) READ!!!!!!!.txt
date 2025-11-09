@@ -17,12 +17,12 @@ THE SITE AND SERVICES ARE  RUNNING ON LOCALHOST THROUGTH THE YAML FILES . NOW WE
 
     IF you want a subdomain ( n8n needs it ) just create another record :  TYPE : CNAME , NAME: yoursubdomain ( give your subdomain ),TARGET: give your  domain
 
-     PROXY STATUS : ON ( you will see an orange cloud ) and TTL: AUTO
+     PROXY STATUS : ON ( you will see an orange cloud ) and TTL: AUTO   # TURN THE PROXY OFF IF YOU WANT THAT DOMAIN TO GO INTERNALLY ONLY ( FOR OUR INTERNAL SERVICES ) . FOR PUBLIC WEBSITES LEAVE IT ON . THA IS VERY IMPORTANT
 
 Now go to crontab -e on your server :
 !!! important !!!  in the crontab -e ( root ) add the full path e.g /root/clouflare/yourdomain.sh .
 
-so it should be like this for one domain : */5 * * * * /root/cloudflare/domain.sh >> /root/cloudflare/domain.log 2>&1
+so it should be like this for one domain : */5 * * * * /root/cloudflare/domain.sh
 
 ensure that on the cloutflare site " always use https " is on. Play freely with the security settings. Now we will be using certbot for ssl 
 
