@@ -109,3 +109,5 @@ DONE!!!!
 
 
 IN THE SIDE DISABLE ALSO THE tailscale ssh . we don't need it because we can ssh through port 22
+
+    !!!!!IMPORTANT!!!! 11. on the tailscale site go to DNS -> Nameservers and add the servers private ip address ( remove everything else ) and choose that ip to use it as exit node . Also DELETE the MagicDNS ( we don't need it ). By doing this you can access your services with the domain that youe local dns provides ( if you did not set up through /etc/hosts)

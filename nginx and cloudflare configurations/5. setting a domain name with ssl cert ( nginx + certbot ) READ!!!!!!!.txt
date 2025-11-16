@@ -19,6 +19,8 @@ THE SITE AND SERVICES ARE  RUNNING ON LOCALHOST THROUGTH THE YAML FILES . NOW WE
 
      PROXY STATUS : ON ( you will see an orange cloud ) and TTL: AUTO   # TURN THE PROXY OFF IF YOU WANT THAT DOMAIN TO GO INTERNALLY ONLY ( FOR OUR INTERNAL SERVICES ) . FOR PUBLIC WEBSITES LEAVE IT ON . THA IS VERY IMPORTANT
 
+     FOR PRIVATE DONMAINS (LIKE WE HAVE FOR OUR INTERNAL SERVICES) THE ORANGE CLOUD MUST BE OFF
+
 Now go to crontab -e on your server :
 !!! important !!!  in the crontab -e ( root ) add the full path e.g /root/clouflare/yourdomain.sh .
 
@@ -62,3 +64,5 @@ sudo certbot delete --cert-name nameofthecertyouwantodelete
 11.11 certbot autorenews the certs autmaticly just make sure that nginx starts after reboots
 
 !!!! Follow THE NGINX CONFIGS FOR BOTH THE SITE AND THE SEVICES .!!!!!! PORT FORWARD ONLY PORT 80 AND PORT 443!!!!!!!!
+
+!!!! FOR EVERY CNAME that is pointing tou a domain WE MUST do a saparate SSL CERT for that !!!!

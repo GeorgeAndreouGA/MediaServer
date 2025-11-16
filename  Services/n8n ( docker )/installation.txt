@@ -1,6 +1,6 @@
 create a folder : mkdir /root/Docker/n8n
 
-create  the n8n.yaml file  
+create  the n8n.yaml file  and the .env
 
 After you have the correct .yaml file => docker compose -f /root/Docker/n8n/n8n.yaml up -d # start the container
 
@@ -42,7 +42,7 @@ After you have the correct .yaml file => docker compose -f /root/Docker/n8n/n8n.
  4) Now in order  for our whitlist ip's (devices) to access the domain we have to edit thier /etc/hosts file ( each one , SEE READ FIRST.txt). Since docker containers
     are isolated inviroments and we tread them like a new device in the .yaml file of n8n we have to add (see n8n.yaml) : extra_hosts:
                                                                                                                            - "subdomain.domain.com:private_ip_of_server"
-
+YOU CAN SKIP 4 IF YOUR ROUTER SUPPORTS LOCAL DNS OVVERIGHT ( for this we are going to be using pi-hole)
 
 !!!DONE!!! Always make the quastion: how is trying to access my services ? ( in this case n8n). What do i have to do in order to have access to them? 
 

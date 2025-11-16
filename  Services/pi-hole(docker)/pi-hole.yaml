@@ -1,0 +1,12 @@
+services:
+  pihole:
+    image: pihole/pihole:latest
+    env_file: .env
+    ports:
+      - "private_ip_of_server:53:53/tcp"  # Don't use loopback address here
+      - "private_ip_of_server:53:53/udp"   # Don't use loopback address here
+      - "127.0.0.1:8081:80/tcp"   # Web interface for NGINX
+    volumes:
+      - ./etc-pihole:/etc/pihole
+      - ./etc-dnsmasq:/etc/dnsmasq.d
+    restart: unless-stopped

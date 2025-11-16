@@ -107,6 +107,14 @@ services:
         target: "_blank"
         tag: "docker container monitor"
         keywords: "linux-docker-container-monitoring"
+      - name: "pi-hole"
+        icon: "fa-brands fa-raspberry-pi"
+        subtitle: "dns-monitor"
+        url: "https://subdomain.domainname.com.com:8445/admin/login"
+        target: "_blank"
+        tag: "dns-monitoring system"
+        keywords: "linux-dns-monitoring system"
+
   - name: "Music Dashboard"
     icon: "fas fa-th-large"
     items:
