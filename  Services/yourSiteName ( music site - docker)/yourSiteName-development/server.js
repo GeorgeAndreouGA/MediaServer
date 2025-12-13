@@ -76,11 +76,11 @@ const csrfProtection = csrf({
 
 // Input validation helper
 const isValidFilename = (filename) => {
-  return typeof filename === 'string' && 
-         filename.length > 0 && 
+  return typeof filename === 'string' &&
+         filename.length > 0 &&
          filename.length <= 255 &&
-         !filename.includes('/') && 
-         !filename.includes('\\') && 
+         !filename.includes('/') &&
+         !filename.includes('\\') &&
          !filename.includes('..') &&
          /\.(mp3|wav|flac)$/i.test(filename);
 };
@@ -89,7 +89,7 @@ const isValidFilename = (filename) => {
 function releaseDueTracks() {
   const now = new Date();
   console.log('🕐 Checking scheduled tracks at:', now.toISOString());
-  
+
   let schedList = [];
   try {
     schedList = JSON.parse(fs.readFileSync(SCHEDULED_JSON, 'utf8') || '[]');
@@ -105,7 +105,7 @@ function releaseDueTracks() {
   schedList.forEach(item => {
     const scheduledTime = new Date(item.time);
     console.log(`🎵 Track: ${item.file}, Scheduled: ${scheduledTime.toISOString()}, Due: ${scheduledTime <= now}`);
-    
+
     if (scheduledTime <= now) {
       dueFiles.push(item.file);
     } else {
@@ -134,6 +134,11 @@ app.use(express.json({ limit: '10kb' }));
 app.use((req, res, next) => {
   releaseDueTracks();
   next();
+});
+
+// Favicon
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'html', 'music.ico'));
 });
 
 // Static file serving
@@ -199,20 +204,20 @@ app.get('/index', (req, res) => {
     if (err) {
       return res.status(500).send('Error loading page');
     }
-    
+
     // Replace placeholders with environment variables
     const siteName = process.env.SITE_NAME;
     const siteSubtitle = 'Retro Vibes';
     const youtubeUrl = process.env.YOUTUBE_URL;
     const youtubeLabel ='VISIT OUR YOUTUBE CHANNEL';
-    
+
     // Replace placeholders in HTML
     const updatedHtml = html
       .replace(/\{\{SITE_NAME\}\}/g, siteName)
       .replace(/\{\{SITE_SUBTITLE\}\}/g, siteSubtitle)
       .replace(/\{\{YOUTUBE_URL\}\}/g, youtubeUrl)
       .replace(/\{\{YOUTUBE_LABEL\}\}/g, youtubeLabel);
-    
+
     res.setHeader('Content-Type', 'text/html');
     res.send(updatedHtml);
   });
@@ -257,7 +262,7 @@ app.post('/admin/publish', express.json(), csrfProtection, (req, res) => {
   // Immediate publishes
   let immed = req.body.files || [];
   if (!Array.isArray(immed)) immed = [immed];
-  
+
   // Validate filenames
   const invalidFiles = immed.filter(f => !isValidFilename(f));
   if (invalidFiles.length > 0) {
@@ -265,17 +270,17 @@ app.post('/admin/publish', express.json(), csrfProtection, (req, res) => {
   }
 
   // Scheduled publishes
-  const sched = Array.isArray(req.body.scheduled) 
-    ? req.body.scheduled 
+  const sched = Array.isArray(req.body.scheduled)
+    ? req.body.scheduled
     : req.body.scheduled ? [req.body.scheduled] : [];
 
   // Validate scheduled items
-  const invalidScheduled = sched.filter(item => 
-    !item || !item.file || !item.time || 
-    !isValidFilename(item.file) || 
+  const invalidScheduled = sched.filter(item =>
+    !item || !item.file || !item.time ||
+    !isValidFilename(item.file) ||
     isNaN(new Date(item.time).getTime())
   );
-  
+
   if (invalidScheduled.length > 0) {
     return res.status(400).send('Invalid scheduled items');
   }
@@ -307,7 +312,7 @@ app.post('/admin/publish', express.json(), csrfProtection, (req, res) => {
 app.post('/admin/delete', express.urlencoded({ extended: true }), csrfProtection, (req, res) => {
   let toDelete = req.body.filesToDelete || [];
   if (!Array.isArray(toDelete)) toDelete = [toDelete];
-  
+
   // Validate filenames
   const invalidFiles = toDelete.filter(f => !isValidFilename(f));
   if (invalidFiles.length > 0) {
@@ -330,7 +335,7 @@ app.post('/admin/delete', express.urlencoded({ extended: true }), csrfProtection
 app.post('/admin/scheduled/delete', express.urlencoded({ extended: true }), csrfProtection, (req, res) => {
   let toDelete = req.body.scheduledToDelete || [];
   if (!Array.isArray(toDelete)) toDelete = [toDelete];
-  
+
   // Validate filenames
   const invalidFiles = toDelete.filter(f => !isValidFilename(f));
   if (invalidFiles.length > 0) {

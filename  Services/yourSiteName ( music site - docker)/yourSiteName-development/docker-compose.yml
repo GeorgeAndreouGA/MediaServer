@@ -17,7 +17,11 @@ services:
       - yourMusicDir:/app/music:ro
     networks:
       - yourNetwork-network
-
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
 networks:
   yourName-network:
     name: yourNetwork-network
