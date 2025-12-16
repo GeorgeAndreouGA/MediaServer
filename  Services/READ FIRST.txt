@@ -10,7 +10,7 @@ But since we want our servises to be running locally we are going to be forwadin
 
 This way we are going to be autorenwing our site cert through 443 ( certbot ) , nginx will be using port 80 and we are going to be using the close port 8443 for our services ( we can access them in the network or through vpn ( make the correct  changes to the serve's firewall and to the nginx config.)).
 
-like our music site ( for the admin ) we are going to be accessing our services through the private_ip of_server:8443/service_name ( for the admin of the music website is private_ip of_server:443/admin but we can skip the 443 because is the base port of the ssl cert but for our servises we have to put the 8443 ) 
+we are going to be accessing our services through the private_ip of_server:8443/service_name ( for the admin of the music website is private_ip of_server:443/admin but we can skip the 443 because is the base port of the ssl cert but for our servises we have to put the 8443 ) 
 
 For other services the only thing that you have to do is to make the .yaml file ( if running on docker and always on the ports selection in the .yaml file add the private_ip_server:server_host_port:docker_hosst_port) and go to the ( nginx config file for services after-cerbot-ssl-cert) and add the servise ()
 

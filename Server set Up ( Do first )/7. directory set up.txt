@@ -1,0 +1,27 @@
+now that we have done the " Server set Up " we are going to create our directory that our services will be in when using docker services!!!
+
+since we are working with the root user : mkdir /root/Docker
+
+Under Docker folder we are going to be placing our docker services with there .yaml files. ( emby , homer ect ....)
+
+We are going to store our nginx configs for ssl certs with revers proxy in /etc/nginx/sites-available
+
+!!!!IMPORTANT !!!! for security all of our services will be in docker containers
+
+
+
+Also for cloudflare .sh scripts that will update the public ip from  each domain we own ( 1 domain = 1 .sh script) we are going to be 
+
+placing them to /root/clouflare/
+
+
+for every domain the .sh is the same just change the api token and the zone id based on the domain ( differrent fot every domain the api and the zone id)
+for each .sh see ( cloudflare config folder  )
+
+
+for every subdomain you create for a domain e.g first.domain.com , second.domain.com ..... you will need to create an nginx conig and an ssl cert ( certbot )
+
+for each one . These is because when you generate an ssl cert from certbot it only generates for the domain.com and not for the *.domain.com 
+
+* ( being the subpath)
+
