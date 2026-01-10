@@ -1,0 +1,68 @@
+services:
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:alpine-7.4-latest
+    platform: linux/arm64
+    container_name: zabbix-server
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_SERVER_HOST: ${DB_SERVER_HOST}
+      DB_SERVER_PORT: ${DB_SERVER_PORT}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:10051:10051"
+    networks:
+      - mysql_mysql-net # Use the existing external network for MySQL
+    volumes:
+      - zabbix_server_data:/var/lib/zabbix
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:alpine-7.4-latest
+    platform: linux/arm64
+    container_name: zabbix-web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_SERVER_HOST: ${DB_SERVER_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      PHP_TZ: ${PHP_TZ}
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: "10051"
+    networks:
+      - mysql_mysql-net # Use the existing external network for MySQL
+    ports:
+      - "127.0.0.1:10052:8080"
+    volumes:
+      - zabbix_web_data:/var/lib/zabbix
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:alpine-7.4-latest
+    platform: linux/arm64
+    container_name: zabbix-agent
+    restart: unless-stopped
+    privileged: true
+    pid: host
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: "10051"
+      ZBX_HOSTNAME: zabbix-agent
+      ZBX_REFRESHACTIVECHECKS: 60
+    networks:
+      - mysql_mysql-net # Use the existing external network for MySQL
+    ports:
+      - "127.0.0.1:10050:10050"
+    volumes:
+      - /proc:/host/proc:ro      # CPU, memory, network stats
+      - /sys:/host/sys:ro        # Disk I/O, hardware info
+      - /:/host/root:ro          # Optional: filesystem usage
+networks:
+  mysql_mysql-net:
+    external: true
+
+volumes:
+  zabbix_server_data:
+  zabbix_web_data:

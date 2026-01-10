@@ -2,15 +2,15 @@
 
 # Cloudflare API credentials
 API_TOKEN="your_cloudflare_api_token_here"
-ZONE_ID="your_zone_id_here"
-RECORD_NAME="your domain.com"
+ZONE_ID="your_cloudflare_zone_id_here"
+RECORD_NAME="your_domain_here"
 
 # Get current public IP
 IP=$(curl -s https://api.ipify.org)
 
 # Get DNS Record ID dynamically
 RECORD_ID=$(curl -s -X GET \
-    "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?type=A&name=${RECO
+    "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?type=A&name=${RECORD_NAME}" \
     -H "Authorization: Bearer ${API_TOKEN}" \
     -H "Content-Type: application/json" | jq -r '.result[0].id')
 
@@ -19,4 +19,13 @@ UPDATE=$(curl -s -X PUT \
     "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${RECORD_ID}" \
     -H "Authorization: Bearer ${API_TOKEN}" \
     -H "Content-Type: application/json" \
-    --data "{\"type\":\"A\",\"name\":\"${RECORD_NAME}\",\"content\":\"${IP}\",\"ttl\":120
+    --data "{\"type\":\"A\",\"name\":\"${RECORD_NAME}\",\"content\":\"${IP}\",\"ttl\":120,\"proxied\":true}")
+
+                                                                                      
+           #  !!! IMPORTANT !!!                                                                          
+                                                                                      
+             # for services that are internal
+             # --data "{\"type\":\"A\",\"name\":\"${RECORD_NAME}\",\"content\":\"${IP}\",\"ttl\":120,\"proxied\":false}")
+
+             # for services that are publicly accessible
+             # --data "{\"type\":\"A\",\"name\":\"${RECORD_NAME}\",\"content\":\"${IP}\",\"ttl\":120,\"proxied\":true}")
