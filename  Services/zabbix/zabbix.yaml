@@ -11,8 +11,6 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "127.0.0.1:10051:10051"
     networks:
       - mysql_mysql-net # Use the existing external network for MySQL
     volumes:
@@ -53,8 +51,6 @@ services:
       ZBX_REFRESHACTIVECHECKS: 60
     networks:
       - mysql_mysql-net # Use the existing external network for MySQL
-    ports:
-      - "127.0.0.1:10050:10050"
     volumes:
       - /proc:/host/proc:ro      # CPU, memory, network stats
       - /sys:/host/sys:ro        # Disk I/O, hardware info

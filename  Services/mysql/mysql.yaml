@@ -9,8 +9,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./conf.d:/etc/mysql/conf.d
-    ports:
-      - "127.0.0.1:3306:3306"
+ 
     networks:
       - mysql-net
     healthcheck:
@@ -26,3 +25,6 @@ volumes:
 networks:
   mysql-net:
     driver: bridge
+
+
+#no need to open port to host since each service that is going to be using db will use the mysql network
