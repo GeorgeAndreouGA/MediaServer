@@ -113,6 +113,14 @@ services:
         target: "_blank"
         tag: "dns-monitoring system"
         keywords: "linux-dns-monitoring system"
+      - name: "mini-games"
+        icon: "fa-solid fa-dice"
+        subtitle: "playing mini-games on the go "
+        url: "https://myfatnasservices.com/mini-games"
+        target: "_blank"
+        tag: "mini-games"
+        keywords: "fun"
+
 
   - name: "Music Dashboard"
     icon: "fas fa-th-large"
