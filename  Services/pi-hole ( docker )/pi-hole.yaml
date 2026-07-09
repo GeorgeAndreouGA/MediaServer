@@ -1,0 +1,12 @@
+services:
+  pihole:
+    image: pihole/pihole:latest
+    env_file: .env
+    ports:
+      - "53:53/tcp"              # no bind address — must listen on both the LAN and Tailscale interfaces
+      - "53:53/udp"              # no bind address — must listen on both the LAN and Tailscale interfaces
+      - "127.0.0.1:8081:80/tcp"  # web UI, reached through nginx only
+    volumes:
+      - ./etc-pihole:/etc/pihole
+      - ./etc-dnsmasq:/etc/dnsmasq.d
+    restart: unless-stopped

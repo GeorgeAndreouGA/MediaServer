@@ -1,58 +1,71 @@
-create a folder : mkdir /root/Docker/n8n
+# n8n — Installation
 
-create  the n8n.yaml file  and the .env
+> n8n's own reverse-proxy requirements are picky enough that they get a dedicated nginx config — see [`nginx configs/internal/n8n_nginx.conf`](<../../nginx and cloudflare configurations/nginx configs/internal/n8n_nginx.conf>) and copy it as-is rather than improvising.
 
-After you have the correct .yaml file => docker compose -f /root/Docker/n8n/n8n.yaml up -d # start the container
+## 1. Get a subdomain
 
+n8n needs its own subdomain (a bare `domain.com/n8n` path doesn't work reliably). In Cloudflare, add a `CNAME` record for your subdomain (e.g. `n8n`) pointing at your domain — see [Domain &amp; SSL setup](<../../nginx and cloudflare configurations/5. setting a domain name with ssl cert.md>) for the full DNS walkthrough. Every other service in this repo can take or leave a subdomain; n8n specifically needs one.
 
- # make sure the n8n-data privilages are set yourUser:youUser ( use chown ) ( VERY IMPORTANT )  NOT ROOT VERY IMPORTANT
+## 2. Create the service directory
 
+```bash
+mkdir -p /root/Docker/n8n
+```
 
- use ls -la to see ownership 
+Place `n8n.yaml` there, and create `.env` from `.env.example` (see this folder) with your own subdomain, timezone, etc.
 
+## 3. Start the container
 
- use nxinx config
+```bash
+docker compose -f /root/Docker/n8n/n8n.yaml up -d
+```
 
+## 4. Fix data ownership
 
- !!!! IMPORTANT !!!! in the n8n if you are going to set up a scheduler to ping you INTERNAL SERVICES ( emby , Netdata etc...)
- you have to use the same aproach as the other sevices in order for n8n container to see your internal services dispite 
- beeing on the same network as your server ( actauly they are not since each container hase it's own ip with its own subnet ).
- container are isolated inviroments so think of it as a separete server ( like a vm , almost ) that is trying to access your 
- domain.com that is not publicly available. So what we do for every other service ( what we did for emby , homer etc...)? 
- After exposing thier container to 127.0.0.1:hostport:containerport we used nginx and ufw firewall to allow internal ip's,(only internal ip's,vpn subnet (zerotier is installed on our
- server) and we can also add docker container ip's( better add the container subnet because each time the container goes down and then back up it gets another ip but stays on the same 
- subnet. Each container gets its own subnet -> own ip address ( diferent from the host)) since we exposed it only to an internal port with no port forward . 
- If we set a public ip in the firewall and nginx allow list ,  it will fail to access the services due to that reason.) So for n8n to be able to " see " the services domain.com 
- we have to :
+```bash
+ls -la /root/Docker/n8n/n8n-data
+sudo chown -R <user>:<user> /root/Docker/n8n/n8n-data
+```
 
- 1) find the subnet of the container that n8n is in :   1.a)docker ps -a ( list all container with their id ) 
-                                                    
-                                                        1.b) docker exec -it < container id > sh   ( get inside the container ) 
-                                                       
-                                                        1.c) ip a ( list the network adapters with thier ip, you should only see 2 : the loopback (127.0.0.1 ) BUT THIS IS THE LOOPBACK FOR THAT CONTAINER AND NOT THE HOST)
+**This must not be root.** n8n's own process refuses to run comfortably otherwise.
 
-                                                        you should find something like : 127.32.0.5/16 ( this is the containers ip. We want to use the container subnet (172.32.0.0/16) because the ip is dynamic)
- 
- 
- 2) go to nginx and under each location /yourService  in the allow section add the subnet of n8n container ( see nginx config )
+## 5. Reverse proxy
 
+Use `nginx configs/internal/n8n_nginx.conf` as-is for the site config, then reload nginx.
 
- 3) Allow the subnet to access the internal port of your services ( mine is 8443 ) :      ufw allow from 172.32.0.0/16 to any port 8443 proto tcp
-                                                  
- 4) Now in order  for our whitlist ip's (devices) to access the domain we have to edit thier /etc/hosts file ( each one , SEE READ FIRST.txt). Since docker containers
-    are isolated inviroments and we tread them like a new device in the .yaml file of n8n we have to add (see n8n.yaml) : extra_hosts:
-                                                                                                                           - "subdomain.domain.com:private_ip_of_server"
-YOU CAN SKIP 4 IF YOUR ROUTER SUPPORTS LOCAL DNS OVVERIGHT ( for this we are going to be using pi-hole)
+## Reaching other internal services from n8n workflows
 
-!!!DONE!!! Always make the quastion: how is trying to access my services ? ( in this case n8n). What do i have to do in order to have access to them? 
+If a workflow needs to poll another internal service on this server (Emby, a monitoring endpoint, etc.) by its domain name, there's an extra wrinkle: **containers are isolated network namespaces.** Even though n8n runs on the same physical server, from inside the container it's effectively a separate machine trying to reach `domain.com` — and `domain.com` isn't publicly resolvable to begin with (it's internal-only, see [DNS layers](<../../nginx and cloudflare configurations/5. setting a domain name with ssl cert.md>)).
 
-1) be in the network to access the internal port ( n8n container is on the server that the services are running) ( for our whitlist devices we use zerotier vpn ( see "server set up first (Do first) for vpn self hosting ))
+The fix follows the exact same pattern used for every other service reaching an internal domain — nginx + UFW allow-listing — except the "client" here is the n8n container, whose IP changes every time it restarts. Allow-list its **subnet** instead, which stays constant:
 
-2) be whitlisted from nginx
+1. Find the container's subnet:
 
-3) be whitlisted from firewall ( ufw )
+   ```bash
+   docker ps -a
+   docker exec -it <container-id> sh
+   ip a
+   ```
 
-4) edit the device (n8n container or other devices from vpn) /etc/hosts 
-                                                                                                       
-                                                                                                                                   
-                                                                                                                                
+   You'll see the container's own loopback (irrelevant) plus an address like `172.32.0.5/16` — the `/16` is the subnet you want (`172.32.0.0/16`), since the container's specific IP is reassigned on every restart but the subnet is stable.
+2. Add that subnet to the `allow` list of every internal `location` block n8n needs to reach (see the nginx configs referenced above).
+3. Allow the subnet through UFW to the relevant internal port:
+
+   ```bash
+   sudo ufw allow from 172.32.0.0/16 to any port <internal-port> proto tcp
+   ```
+4. Since the container can't resolve the internal domain via DNS either, add it directly in `n8n.yaml`:
+
+   ```yaml
+   extra_hosts:
+     - "domain.com:<private-ip-of-server>"
+   ```
+
+   (Already present in `n8n.yaml` as a template — fill in the real domain and IP.) You can skip this step if your router/local DNS (Pi-hole) already resolves the domain for every device on the network, container subnets included.
+
+**When troubleshooting access to any service, ask in this order:**
+
+1. Is the client (or container subnet) actually on a network path that can reach the internal port at all? (LAN, or [VPN](<../../Server set Up ( Do first )/6. vpn ( tailscale ).md>))
+2. Is it allow-listed in nginx?
+3. Is it allow-listed in UFW?
+4. Can it resolve the domain name in the first place (local DNS, or `extra_hosts`)?

@@ -1,0 +1,4 @@
+# Real secrets — every service ships a committed .env.example instead
+.env
+!.env.example
+

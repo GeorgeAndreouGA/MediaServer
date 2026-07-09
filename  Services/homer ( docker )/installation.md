@@ -1,21 +1,33 @@
-create a folder : mkdir /root/Docker/homer
+# Homer — Installation
 
-create  the emby.yaml file = >   choose your architecture https://hub.docker.com/r/b4bz/homer
+Homer is a static dashboard that links out to every other service on the server.
 
+## 1. Create the service directory
 
-In the .yaml we have =>
-                                 volumes:
-                                - /root/Docker/homer/config:/www/assets # Make sure your local config directory exists
-                                  ports:
-                                - "127.0.0.1:8080:8080"
+```bash
+mkdir -p /root/Docker/homer
+```
 
-!!! important !!! make sure that they are correct ( like emby )
+Place `homer.yaml` (see this folder) there.
 
-docker compose -f /root/Docker/homer/homer.yaml up -d # start the container 
+## 2. Notes on `homer.yaml`
 
- Now make changes to the nginx  ( config file for services after-cerbot-ssl-cert )
+- `volumes`: `/root/Docker/homer/config:/www/assets` — Homer creates this directory automatically on first start; you don't need to `mkdir` it yourself.
+- `ports`: stays bound to `127.0.0.1` — reached only through nginx, never directly. See [Firewall (UFW)](<../../Server set Up ( Do first )/4. ufw ( firewall ).md>).
+- `user: 1000:1000` avoids Homer running as root inside the container.
 
+## 3. Start the container
 
- Homer works with the config.yml file . create it under the /root/Docker/homer/config ( this path will be created automaticaly after you start the container )
+```bash
+docker compose -f /root/Docker/homer/homer.yaml up -d
+```
 
- you can add more services to the config.yml
+## 4. Configure the dashboard
+
+Homer is driven entirely by `config/config.yml`, created under `/root/Docker/homer/config` after the first start (see this folder's `config/config.yml` for the working example: title, theme, and the service links themselves).
+
+Add an entry under `services` for anything you want on the dashboard — icon (from [Font Awesome](https://fontawesome.com/search)), name, subtitle, and the URL it should link to.
+
+## 5. Reverse proxy
+
+Add Homer's location block to your internal nginx config — see [`nginx configs/internal/internal_services.conf`](<../../nginx and cloudflare configurations/nginx configs/internal/internal_services.conf>) for the working example (`/homer/` → `http://127.0.0.1:8080/`).
