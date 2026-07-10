@@ -22,8 +22,9 @@ Every containerized service binds its host port to `127.0.0.1` only — nginx an
 Follow these in order on a fresh server:
 
 1. **[Server Setup (Do First)](<Server set Up ( Do first )>)** — static IP, SFTP, SSH hardening, UFW, Docker, and a Tailscale VPN exit node.
-2. **[Nginx &amp; Cloudflare Configuration](<nginx and cloudflare configurations>)** — domain/DNS setup, SSL certificates via [sslfree.io](https://sslfree.io), Cloudflare WAF rules, and the DMZ/internal reverse-proxy split.
-3. **[Services](< Services>)** — the services themselves.
+2. **[Network Schema and Configuration](<network schema and configuration/network schema and configuration.md>)** — VLAN layout and diagram, gateway firewall/inter-VLAN policy, trunk/access port and STP configuration for the UniFi gear.
+3. **[Nginx &amp; Cloudflare Configuration](<nginx and cloudflare configurations>)** — domain/DNS setup, SSL certificates via [sslfree.io](https://sslfree.io), Cloudflare WAF rules, and the DMZ/internal reverse-proxy split.
+4. **[Services](< Services>)** — the services themselves.
 
 ## Services
 
@@ -44,3 +45,4 @@ Follow these in order on a fresh server:
 - **VPN exit node**: [Tailscale](<Server set Up ( Do first )/6. vpn ( tailscale ).md>) gives remote access to everything the LAN can reach, without port-forwarding anything beyond 80/443.
 - **Local DNS**: Pi-hole resolves internal-only domains for LAN/VPN clients; public-site domains are deliberately **not** added there — see [DNS layers](<nginx and cloudflare configurations/5. setting a domain name with ssl cert.md>) for why.
 - **Three-tier user model**: root runs every service; a regular user has shell access; an SFTP-only user is chrooted with no shell — see [SFTP](<Server set Up ( Do first )/2. sftp.md>).
+- **VLAN segmentation, default-deny**: every service/role sits on its own VLAN behind the gateway firewall, which blocks all inter-VLAN traffic by default and only allows the specific flows each VLAN needs — see [Network Schema and Configuration](<network schema and configuration/network schema and configuration.md>).
